@@ -29,6 +29,10 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+// library used for check marks
+import javax.swing.JCheckBox;
+
+import java.util.ArrayList;
 //library used to get random integer
 import java.util.Random;
 
@@ -40,7 +44,10 @@ public class MyFrame extends JFrame implements ActionListener {
 	JButton removeItem;
 	JButton exitApplication;
 	JPanel panel;
+	public ArrayList<JCheckBox> checkBoxes = new ArrayList<>();
+	JCheckBox checkBox;
 	int row = 0;
+	
 
 	groceries list = new groceries();
 
@@ -150,10 +157,12 @@ public class MyFrame extends JFrame implements ActionListener {
 			Random random = new Random();
 			// grabbing strings with JOptionPane
 			String item = JOptionPane.showInputDialog("Grocery Item:");
+			
 			if (item == null || item.isEmpty()) {
 		        JOptionPane.showMessageDialog(panel, "Please enter a valid item.", "Error", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			
 			String priceInput = JOptionPane.showInputDialog("Enter the Price");
 			// if the user pressed cancel
 		    if (priceInput == null) 
@@ -162,6 +171,7 @@ public class MyFrame extends JFrame implements ActionListener {
 		    // have to convert string to float because can't check if float is null
 		    // there is a error if someone cancels the JOptionPane so we have to use try
 		    float price;
+		    
 		    try {
 		    	price = Float.parseFloat(priceInput);
 		    } catch (NumberFormatException ex) {
@@ -171,27 +181,56 @@ public class MyFrame extends JFrame implements ActionListener {
 		    
 			int randomDigit = random.nextInt(100);
 			
+			checkBox = new JCheckBox();
+			checkBox.setBackground(Color.GRAY);
+			checkBox.addActionListener(this);
+			checkBoxes.add(checkBox);
+			
 			JLabel itemLabel = list.addItem(item, price, randomDigit);
+			if (itemLabel == null)
+			{
+		        JOptionPane.showMessageDialog(panel, "Please enter a different product.", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+			
 			// Add JLabel to JPanel
 			panel.add(itemLabel); 
+			panel.add(checkBox);
 			// Update panel
             panel.revalidate(); 
             panel.repaint();
             
 			row++;
-			
-
 		}
+		
 		if (e.getSource() == removeItem) {
 			// check if user clicks cancel, so error doesn't generate
+
 			try {
-				int index = Integer.parseInt(JOptionPane.showInputDialog("Enter index of the item to remove"));
-		
-				list.removeItem(index, panel);
+				int index = Integer.parseInt(JOptionPane.showInputDialog("Enter index of the item to remove"));		
+				list.removeItem(index, panel, checkBoxes);
 			} catch (NumberFormatException ex) {
 		        JOptionPane.showMessageDialog(panel, "Please enter a valid index.", "Error", JOptionPane.ERROR_MESSAGE);
 			}
-		} 
+			
+		}
+		
+		int counter = 0;
+		for (JCheckBox newBox : checkBoxes) {
+	        if (e.getSource() == newBox) 
+	        {
+	            // Check if the checkbox is selected and update label accordingly
+	            if (newBox.isSelected()) {
+	            	list.checkItemOff(counter);
+	            } else {
+	            	list.checkItemAway(counter);
+	            }
+	            panel.revalidate();
+	            panel.repaint();
+	        }
+	        counter++;
+		}
+
 
 	}
 

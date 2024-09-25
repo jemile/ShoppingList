@@ -9,7 +9,6 @@ My goal for this project was to learn how to use JFrame, because I am used to C+
 The only past experience I have had with GUI's is ImGui so I think this will be very interesting to see how it works. I will leave comments on where I struggled,
 and why I added certain lines of code the way i did
 
-
  */
 
 public class main {
